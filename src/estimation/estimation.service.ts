@@ -26,7 +26,7 @@ export class EstimationService {
 
   async executeSwap(UpdateEstimationDto: UpdateEstimationDto) {
     const { baseCcy, quoteCcy, side, sz, feeOfBelo } = UpdateEstimationDto;
-    let quoteId: any = UpdateEstimationDto.quoteId;
+    let quoteId: string | object = UpdateEstimationDto.quoteId;
     const amount = Number(sz) - (feeOfBelo * Number(sz)) / 100;
     try {
       const timestamp = new Date().toISOString();
@@ -36,7 +36,7 @@ export class EstimationService {
           take: 1,
           order: { id: 'DESC' },
         });
-        quoteId = quoteId.quote_id;
+        quoteId = quoteId['quote_id'];
       }
       const body = {
         baseCcy: baseCcy,
@@ -95,7 +95,7 @@ export class EstimationService {
       body,
     );
 
-    let response: any = await this.httpService.axiosRef
+    let response = await this.httpService.axiosRef
       .post('https://www.okx.com/api/v5/asset/convert/estimate-quote', body, {
         headers: {
           accept: 'application/json',
@@ -108,15 +108,15 @@ export class EstimationService {
       })
       .catch((error) => console.log(error.response.data));
 
-    response = response['data']['data'].map((element: any) => ({
-      baseCurrency: element.baseCcy,
-      baseSize: element.baseSz,
-      priceOfBaseCurrency: element.cnvtPx,
-      originAmount: element.origRfqSz,
-      quoteCurrency: element.quoteCcy,
-      quoteId: element.quoteId,
-      side: element.side,
-      expirateTime: element.ttlMs,
+    response = response['data']['data'].map((element: object) => ({
+      baseCurrency: element['baseCcy'],
+      baseSize: element['baseSz'],
+      priceOfBaseCurrency: element['cnvtPx'],
+      originAmount: element['origRfqSz'],
+      quoteCurrency: element['quoteCcy'],
+      quoteId: element['quoteId'],
+      side: element['side'],
+      expirateTime: element['ttlMs'],
     }));
 
     try {
