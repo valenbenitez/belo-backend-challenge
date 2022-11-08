@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateEstimationDto } from './dto/create-estimation.dto';
 import { UpdateEstimationDto } from './dto/update-estimation.dto';
 import * as CryptoJS from 'crypto-js';
@@ -72,6 +72,9 @@ export class EstimationService {
       return response['data'];
     } catch (error) {
       console.log(error);
+      throw new InternalServerErrorException(
+        'Error al intentar ejecutar el swap',
+      );
     }
   }
 
@@ -106,7 +109,10 @@ export class EstimationService {
           'OK-ACCESS-PASSPHRASE': this.PASSPHRASE,
         },
       })
-      .catch((error) => console.log(error.response.data));
+      .catch((error) => {
+        console.log(error.response.data);
+        return error.response.data;
+      });
 
     response = response['data']['data'].map((element: object) => ({
       baseCurrency: element['baseCcy'],
@@ -126,6 +132,7 @@ export class EstimationService {
       await this.estimationRepository.save(estimation);
     } catch (error) {
       console.log(error);
+      return error;
     }
     return {
       data: response[0],

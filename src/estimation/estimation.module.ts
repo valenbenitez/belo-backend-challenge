@@ -9,5 +9,6 @@ import { Estimation } from './entities/estimation.entity';
   imports: [HttpModule, TypeOrmModule.forFeature([Estimation])],
   controllers: [EstimationController],
   providers: [EstimationService],
+  exports: [TypeOrmModule, HttpModule],
 })
 export class EstimationModule {}
